@@ -1,0 +1,113 @@
+import java.util.Scanner;
+import java.io.File;
+import java.lang.Exception;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+public class MyScore5{
+	public static void main(String[] args) throws Exception{
+	
+	//Declare text file to read from
+	File file = new File("data5.txt");
+	Scanner scan = new Scanner(file);
+	
+	//Delcare an arraylist to store the data in the file into
+	ArrayList<String> allLines = new ArrayList<>();
+	
+	//Read the file and store it into the arraylist
+	while(scan.hasNext()){
+		String line = scan.nextLine();
+		allLines.add(line);
+	}
+	
+	//Close the file being read
+	scan.close();
+	
+	//Scan each token in the arrayList. Store non-empty tokens
+	ArrayList<String> allTokens = new ArrayList<>();
+	for (String item : allLines){
+		String [] tokens = item.split("[\\s]+");
+		for (String s : tokens)
+			if (s.length()> 0)
+				allTokens.add(s);
+	}   
+	
+	//ArrayLists for each item to be pulled
+	ArrayList<String> alphabetical = new ArrayList<>();
+	ArrayList<Integer> integers = new ArrayList<>();
+	ArrayList<String> ssn = new ArrayList<>();
+	ArrayList<String> time = new ArrayList<>();
+	
+	//Pull items specific to each ArrayList
+	for (String item : allTokens){
+		if (item.matches ("[A-Za-z,']+"))
+			alphabetical.add(item);
+		if (item.matches ("[0-9]+"))
+			integers.add(Integer.parseInt(item));
+	Matcher matcher;
+	
+	var ssnPattern = Pattern.compile("(?:ssn)(\\d{3}-\\d{2}-\\d{4})");
+		matcher = ssnPattern.matcher(item);
+			if (matcher.find())
+				ssn.add(matcher.group(1));
+			
+	var timePattern = Pattern.compile("(?:time=)(\\d+)(?:ms)");
+		matcher = timePattern.matcher(item);
+			if (matcher.find())
+				time.add(matcher.group(1));
+	}          
+	
+	//Alphabetical order with occurances
+	System.out.println("Alphabetical order with occurences is:\n");
+	int k = 0;
+		Collections.sort(alphabetical);
+		for (int i = 0; i < alphabetical.size(); i++) {
+			var token = alphabetical.get(i);
+			var count = Collections.frequency(alphabetical, token);
+
+			System.out.printf("%-5d%-22s%-22d\n", ++k, token, count);
+
+			i += count - 1;
+		}
+		
+	//Integers
+	System.out.println("\nValid integers are: ");
+	
+	k = 0;
+	
+	for(Integer item : integers)         
+		System.out.printf ("\n%-5d%4d",++k,item);
+
+	
+	//List the valid ssn
+	System.out.println("\n\nValid Social Security Numbers are: ");
+	
+	k = 0;
+	
+	for(String item: ssn)
+		System.out.printf("\n%-5d%-30s", ++k, item);
+	
+		
+	//List the valid Times with a total at the end
+	System.out.println("\n\nValid Times with Total are: ");
+	
+	k = 0;
+	
+	for(String item: time)
+		System.out.printf("\n%-5d%-30s", ++k, item);
+		
+	List <Integer> newList = new ArrayList <Integer> (time.size());
+		for(String intTime : time)
+		
+		newList.add(Integer.valueOf(intTime));
+
+			int totalTime = 0;
+				for(int i = 0; i < newList.size(); i++)
+					totalTime += newList.get(i);
+					
+			System.out.println("\n\n" + "Total time is: " + totalTime);
+	}
+}
