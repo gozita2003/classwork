@@ -1,0 +1,214 @@
+package Compounds;
+
+import elementInfo.Element;
+import elementInfo.ElementManager;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Compound {
+    private static final Pattern compoundPattern = Pattern.compile("[A-Z][a-z]?\\d*|\\(.*\\)\\d*");
+    private static final Pattern elementPattern = Pattern.compile("([A-Z][a-z]?)(\\d*)?");
+    private static final ElementManager elementManager = ElementManager.getInstance();
+
+    private String name;
+    private String formula;
+    private String hillFormula;
+    private double mass;
+    private Map<Element, Integer> elements;
+
+    public Compound(String name, String formula) {
+        this.name = name;
+        this.formula = formula;
+
+        parseElements();
+        computeCompoundMass();
+        constructHillNotation();
+    }
+
+    public Compound(String name, String formula, double mass) {
+        this.name = name;
+        this.formula = formula;
+        this.mass = mass;
+
+        parseElements();
+        constructHillNotation();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getFormula() {
+        return formula;
+    }
+
+    public String getHillFormula() {
+        return hillFormula;
+    }
+
+    public double getMass() {
+        return mass;
+    }
+
+    public Map<Element, Integer> getElements() {
+        return elements;
+    }
+
+    // Helper functions for initialization
+
+    /**
+     * Calculates total compound mass based on the elements in the compound
+     */
+    private void computeCompoundMass() {
+        // We need this to be an atomic double for use inside of the lambda
+        AtomicReference<Double> safeMass = new AtomicReference<>(0.d);
+        elements.forEach((k, v) -> safeMass.updateAndGet(m -> (m + k.getAtomicMass() * v)));
+        mass = safeMass.get();
+    }
+
+    // Same as above but with no lambdas
+    //   (this is probably better since we can avoid using atomics so go ahead and use this instead)
+    private void computeCompoundMass2() {
+        mass = 0.d;
+        for (Entry<Element, Integer> e : elements.entrySet()) {
+            mass += e.getKey().getAtomicMass() * e.getValue();
+        }
+    }
+
+    /**
+     * Takes the compounds elements and orders them into Hill's Notation
+     * Carbon > Hydrogen > Rest of elements in alphabetical order
+     */
+    private void constructHillNotation() {
+        // First bit here just turns the entries in the element map into a sorted stream
+        hillFormula = elements.entrySet().stream().sorted((e1, e2) -> {
+            // Grab just the symbols so we don't have to keep calling the getter
+            String symbol1 = e1.getKey().getSymbol();
+            String symbol2 = e2.getKey().getSymbol();
+
+            if (symbol1.equals("C")) {
+                return -100; // Carbon ALWAYS comes first
+            } else if (symbol1.equals("H")) {
+                if (symbol2.equals("C")) {
+                    return 100; // Again Carbon ALWAYS comes first so H is
+                } else {
+                    return -100; // Hydrogen takes precedent over all others except for Carbon
+                }
+            } else if (symbol2.equals("C")) {
+                return 100; // Carbon should come first; Don't need to check sym1 since we did above
+            } else if (symbol2.equals("H")) {
+                return 100; // Hydrogen should come before all others; Don't need to check sym1 since we did above
+            } else {
+                return symbol1.compareTo(symbol2); // sym1/2 aren't Carbon or Hydrogen so sort normally
+            }
+        })
+        // Take our now sorted stream of Entry<Element, Integer> and map or "convert" them into a stream of Strings
+        // in the form of <Element Symbol><Number of that Element>
+        .map(e -> e.getKey().getSymbol() + ((e.getValue() > 1) ? e.getValue() : ""))
+        // Take our stream of <Symbol><Count> strings and concatenate them into a single string
+        .reduce("", String::concat);
+    }
+
+    private void constructHillNotation2() {
+//        // You can also make the comparator this way but constructing it with the lambda format below is cleaner
+//        Comparator<Entry<Element, Integer>> hillNotation = new Comparator<Entry<Element, Integer>>() {
+//            @Override
+//            public int compare(Entry<Element, Integer> o1, Entry<Element, Integer> o2) {
+                  // Do Hill Notation sorting here
+//            }
+//        }
+
+        Comparator<Entry<Element, Integer>> hillNotation = (e1, e2) -> {
+            // Grab just the symbols so we don't have to keep calling the getter
+            String symbol1 = e1.getKey().getSymbol();
+            String symbol2 = e2.getKey().getSymbol();
+
+            if (symbol1.equals("C")) {
+                return -100; // Carbon ALWAYS comes first
+            } else if (symbol1.equals("H")) {
+                if (symbol2.equals("C")) {
+                    return 100; // Again Carbon ALWAYS comes first so H is
+                } else {
+                    return -100; // Hydrogen takes precedent over all others except for Carbon
+                }
+            } else if (symbol2.equals("C")) {
+                return 100; // Carbon should come first; Don't need to check sym1 since we did above
+            } else if (symbol2.equals("H")) {
+                return 100; // Hydrogen should come before all others; Don't need to check sym1 since we did above
+            } else {
+                return symbol1.compareTo(symbol2); // sym1/2 aren't Carbon or Hydrogen so sort normally
+            }
+        };
+
+        // Get the elements and their counts and sort them according to Hill's Notation
+        List<Entry<Element, Integer>> hillSortedElements = new ArrayList<>(elements.entrySet());
+        hillSortedElements.sort(hillNotation);
+
+        // Iterate over the Hill's Notation sorted list of elements and counts and build a string
+        // in the form of <Symbol><Count>
+        StringBuilder sb = new StringBuilder();
+        for (Entry<Element, Integer> e : hillSortedElements) {
+            sb.append(e.getKey().getSymbol())
+              .append((e.getValue() > 1) ? e.getValue() : "");
+        }
+        hillFormula = sb.toString();
+    }
+
+    /**
+     * Parses the compound formula string and creates a map of individual
+     * elements and the number of occurrences within the compound
+     */
+    private void parseElements() {
+        elements = getElementsFromFormula(formula);
+    }
+
+    private Map<Element, Integer> getElementsFromFormula(String formula) {
+        Map<Element, Integer> elements = new HashMap<>();
+
+        Matcher compoundMatcher = compoundPattern.matcher(formula);
+        while (compoundMatcher.find()) {
+            String match = compoundMatcher.group();
+
+            if (match.startsWith("(")) {
+                //Handle sub compounds
+                final int numCompounds;
+                int endOfGroup = match.lastIndexOf(")");
+
+                if (!match.endsWith(")")) {
+                    String count = match.substring(endOfGroup + 1);
+                    numCompounds = Integer.parseInt(count);
+                } else {
+                    numCompounds = 1;
+                }
+
+                Map<Element, Integer> subCompound = getElementsFromFormula(match.substring(1, endOfGroup));
+                subCompound.forEach((k, v) -> elements.merge(k, v * numCompounds, Integer::sum));
+            } else {
+                //Handle individual elements
+                Matcher elementMatcher = elementPattern.matcher(match);
+                //Check if the element has 1 atom or multiple and parse
+                if (elementMatcher.matches()) {
+                    Element e = elementManager.getElement(elementMatcher.group(1));
+                    int numElements = (elementMatcher.group(2).isEmpty()) ? 1 : Integer.parseInt(elementMatcher.group(2));
+
+                    elements.merge(e, numElements, Integer::sum);
+                } else {
+                    //Print an error if there isn't an existing element found
+                    System.err.println("Bad element data found: " + match + " does not match any existing element. Please try again.");
+                }
+
+            }
+        }
+
+        return elements;
+    }
+
+    public String toString() {
+        String s = String.format("%-15s \t %-10s \t %-10.4f \n", name, formula, mass);
+        return s;
+    }
+}
