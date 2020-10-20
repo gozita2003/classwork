@@ -1,0 +1,204 @@
+package elementInfo;
+
+import java.awt.List;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.lang.*;
+
+public class ElementManager {
+	private static ElementManager instance = null;
+	
+	//This instance allows use throughout the program instead of having to spread it around
+	public static ElementManager getInstance() {
+			if (instance == null) {
+				instance = new ElementManager();
+			}
+			
+			return instance;
+	}
+	
+	private HashMap <String, Element> elementsMap = new HashMap<String, Element>();
+	private ArrayList <Element> elementsList = new ArrayList<Element>();
+	
+	public ElementManager() {
+		try {
+			loadElementsFromFile("src/elementInfo/elements.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public ElementManager(String path) {
+		try {
+			loadElementsFromFile(path);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadElementsFromFile(String path) throws FileNotFoundException{
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(path));
+			String line;
+			//eats the first line, it is not needed
+			br.readLine();
+			
+			//checks if next line read is null for end of file
+			//if not reads in the next element
+			while((line = br.readLine()) != null) {
+				String [] temp = line.split("\t");
+				Element tempElement = new Element(
+						Integer.parseInt(temp[0]), temp[1], temp[2], 
+						Double.parseDouble(temp[3]), temp[4], temp[5]
+				);
+				//System.out.println(tempElement.toString());
+				elementsMap.putIfAbsent(tempElement.getSymbol(), tempElement);
+				elementsList.add(tempElement);
+			}
+			
+			//test print statements to ensure all elements are read in
+			//elementsMapToString();
+			//elementsListToString();
+			br.close();
+
+			instance = this;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void elementsMapToString() {
+		elementsMap.entrySet().forEach(entry->{
+		    System.out.println(entry.getKey() + " " + entry.getValue());  
+		 });
+	}
+	
+	//num is to control state change
+	public String getState(String sel) {
+		String str = "";
+		if(sel.equals("None")) {
+			for(int i = 0; i < elementsList.size(); i++) {
+				str += elementsList.get(i).toString();
+			}
+		}
+		else if(sel.equals("Solid")) {
+			for(int i = 0; i < elementsList.size(); i++) {
+				if(elementsList.get(i).getState().equals("Solid")) {
+					str += elementsList.get(i).toString();
+				}
+			}
+		}
+		else if(sel.equals("Liquid")) {
+			for(int i = 0; i < elementsList.size(); i++) {
+				if(elementsList.get(i).getState().equals("Liquid")) {
+					str += elementsList.get(i).toString();
+				}
+			}
+		}
+		else if(sel.equals("Gas")) {
+			for(int i = 0; i < elementsList.size(); i++) {
+				if(elementsList.get(i).getState().equals("Gas")) {
+					str += elementsList.get(i).toString();
+				}
+			}
+		}
+		else if(sel.equals("Unknown")) {
+			for(int i = 0; i < elementsList.size(); i++) {
+				if(elementsList.get(i).getState().equals("Unknown")) {
+					str += elementsList.get(i).toString();
+				}
+			}
+		}
+		return str;
+	}
+	
+	public String getOrder(String str) {
+		Collections.sort(elementsList, new SortByAtomicNum());
+		
+		if(str.equals("Name")) {
+			Collections.sort(elementsList, new SortByName());
+		}
+		else if(str.equals("Mass")) {
+			Collections.sort(elementsList, new SortByMass()); 
+		}
+	    else if(str.equals("Symbol")) {
+	    	Collections.sort(elementsList, new SortBySymbol()); 
+	    } 
+		String results = "";
+		for(int i = 0; i < elementsList.size(); i++) {
+			results += elementsList.get(i).toString();
+		}
+		return results;
+	}
+	
+	public Element getElement(String symbol) {
+		return elementsMap.get(symbol);
+	}
+	
+	public String getElementByName(String name) {
+		for(Element e: elementsList) {
+			if(e.getName().equals(name)) {
+				return e.toString();
+			}
+		}
+		return "";
+	}
+	
+	public double getCompoundMass(String formula) {
+		Pattern elementPattern = Pattern.compile("(\\p{Upper}\\p{Lower}?)(\\p{Digit}*)");
+		Matcher elementMatcher = elementPattern.matcher(formula);
+		double total = 0;
+		while (elementMatcher.find()) {
+		    for(Element e: elementsList) {
+		    	if(e.getSymbol().equals(elementMatcher.group(1))) {
+		    		if(!(elementMatcher.group(2).equals(""))){
+		    			total += e.getAtomicMass() * (Integer.parseInt(elementMatcher.group(2))-1);
+		    		}
+		    		total += e.getAtomicMass();
+		    	}
+		    }
+		}
+		return total;
+	}
+}
+
+class SortByName implements Comparator<Element>
+{
+    public int compare(Element a, Element b) 
+    { 
+        return a.getName().compareTo(b.getName()); 
+    }
+}
+
+class SortBySymbol implements Comparator<Element>
+{
+    public int compare(Element a, Element b) 
+    { 
+        return a.getSymbol().compareTo(b.getSymbol()); 
+    }
+}
+
+
+class SortByMass implements Comparator<Element> 
+{
+    public int compare(Element a, Element b) 
+    { 
+         
+        if (a.getAtomicMass() < b.getAtomicMass()) return -1;
+        if (a.getAtomicMass() > b.getAtomicMass()) return 1;
+        return 0;
+    } 
+}
+
+class SortByAtomicNum implements Comparator<Element> 
+{
+    public int compare(Element a, Element b) 
+    { 
+        return a.getAtomicNum() - b.getAtomicNum(); 
+    } 
+}
