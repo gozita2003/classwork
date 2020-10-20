@@ -1,0 +1,161 @@
+package compoundInfo;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import elementInfo.Element;
+import elementInfo.ElementManager;
+
+public class Compound {
+	private static final Pattern compoundPattern = Pattern.compile("[A-Z][a-z]?\\d*|\\(.*?\\)||d+");
+	private static final Pattern elementPattern = Pattern.compile("([A-Z][a-z]?)(\\d*)?");
+	private static final ElementManager elementManager = ElementManager.getInstance();
+	private HashMap <String, Compound> compoundMap = new HashMap<String, Compound>();
+
+		private String name;
+		private String formula;
+		private String hillFormula;
+		private double mass;
+		private Map<Element, Integer> elements;
+		
+		public Compound(String name, String formula) {
+			this.name = name;
+			this.formula = formula;
+
+			parseElements();
+			computeCompoundMass();
+			constructHillNotation();
+			}
+
+		public Compound(String name, String formula, double mass) {
+			this.name = name;
+			this.formula = formula;
+			this.mass = mass;
+
+			parseElements();
+			constructHillNotation();
+		}
+		
+		public String getName() {
+	        return name;
+	    }
+
+	    public String getFormula() {
+	        return formula;
+	    }
+
+	    public String getHillFormula() {
+	        return hillFormula;
+	    }
+
+	    public double getMass() {
+	        return mass;
+	    }
+
+	    public Map<Element, Integer> getElements() {
+	        return elements;
+	    }
+		
+	    private void computeCompoundMass() {
+	        mass = 0.d;
+	        for (Entry<Element, Integer> e : elements.entrySet()) {
+	            mass += e.getKey().getAtomicMass() * e.getValue();
+	        }
+	    }
+		
+		private void constructHillFormula() {
+			hillFormula = elements().entrySet().stream().sorted((e1, e2) -> {
+				String symbol1 = e1.getKey().getSymbol();
+				String symbol2 = e2.getKey().getSymbol();
+				
+				if(symbol1.equals("C")){
+					return -100; //Carbon ALWAYS comes first
+					
+				} else if(symbol1.equals("H")) {
+					if (symbol2.equals("C")) {
+						return 100; //Carbon should STILL come first
+					}else {
+						return -100; //Hydrogen comes first when Carbon is absent
+					}
+							
+					
+				} else if(symbol2.equals("C")) {
+					return 100; //Places Carbon FIRST, but moves it left
+					
+				} else if(symbol2.equals("H")) {
+					return 100; //Places Hydrogen first if Carbon is absent, but moves it left
+					
+				} else {
+					return symbol1.compareTo(symbol2);
+				}
+					
+			})
+			.map(e -> e.getKey().getSymbol() + ((e.getValue() > 1) ? e.getValue() : ""))
+			.reduce("", String::concat);
+		}
+		
+		//Sets the elements member variable to the wanted result
+		private void parseElements() {
+		    elements = getElementsFromFormula(formula);
+		}
+		
+		private Map<Element, Integer> getElementsFromFormula(String formula){
+			Matcher compoundMatcher = compoundPattern.matcher(formula);
+			Map <Element, Integer> elements = new HashMap<>();
+			while (compoundMatcher.find()) {
+				String match = compoundMatcher.group();
+				
+				if (match.startsWith("(")) {
+					//Handle sub compounds
+					final int numCompounds;
+					int endOfGroup = match.lastIndexOf(")");
+					
+					if(!match.endsWith(")")){
+						String count = match.substring(endOfGroup + 1);
+						numCompounds = Integer.parseInt(count);
+					} else {
+						numCompounds = 1;
+					}
+					
+					Map<Element, Integer> subCompoundMap = getElementsFromFormula(match.substring(1, endOfGroup));
+					subCompoundMap.forEach((e, numElements) -> {
+						numElements *= numCompounds;
+						elements.merge(e, numElements, Integer :: sum);
+					});
+					
+					
+					//mass += computeCompoundMass(match.substring(1, endOfGroup)) * numCompounds;
+					
+				} else {
+					//Handle individual elements
+					Matcher elementMatcher = elementPattern.matcher(match);
+					//Check if the element has 1 atom or multiple and parse
+					if (elementMatcher.matches()) {
+						Element e = elementManager.getElement(elementMatcher.group(1));
+						int numElements = (elementMatcher.group(2).isEmpty()) ? 1 : Integer.parseInt(elementMatcher.group(2));
+						
+						//Add elements and value to map
+						elements.merge(e, numElements, Integer :: sum);
+						
+					} else {
+						//Print an error if there isn't an existing element found
+						System.err.println("Bad element data found: " + match + " does not match any existing element. Please try again.");
+					}
+					
+				}
+				
+			}
+			
+			return elements;
+		}
+		
+		public Map<Element, Integer> getElements(){
+			return CompoundManager.getElementsFromFormula(formula);
+		}
+		
+		public String toString() {
+			String s = String.format("%-15s \t %-10s \t %-10.4f \n", name, formula, mass);
+			return s;
+		}
+}
