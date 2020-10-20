@@ -1,0 +1,84 @@
+import javafx.application.Application;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class keylogger extends Application{
+
+   //Create an area for the text
+   private TextArea textBoxArea = new TextArea("");
+   
+   public static void main(String[] args){
+      Application.launch(args);
+   }
+   
+   @Override
+   public void start(Stage stage){
+      
+      //Create a name for the text entry area
+      Label textName = new Label("Name: ");
+      //Create the actual text field
+      TextField textField = new TextField();
+      
+      //Create the HBox
+      HBox hbox = new HBox();
+      //Padding and spacing for HBox
+      hbox.setPadding(new Insets(20));
+      hbox.setSpacing(20);
+      //Add children
+      hbox.getChildren().addAll(textName, textField);
+      
+      //Create VBox
+      VBox vbox = new VBox();
+      //Padding and spacing for VBox
+      vbox.setPadding(new Insets(20));
+      vbox.setSpacing(20);
+      //Add children
+      vbox.getChildren().addAll(hbox, textBoxArea);
+      
+      //Add the key pressed and released
+      textField.setOnKeyTyped(new EventHandler<KeyEvent>(){
+         
+         public void handle (final KeyEvent keyEvent){
+            handleEvent(keyEvent);
+         }
+      });
+      
+       textField.setOnKeyPressed(new EventHandler<KeyEvent>(){
+         public void handle(final KeyEvent keyEvent){
+            handleEvent(keyEvent);
+         }
+      });
+      
+      textField.setOnKeyReleased(new EventHandler<KeyEvent>(){
+         public void handle(final KeyEvent keyEvent){
+            handleEvent(keyEvent);
+         }
+      });
+      
+      //Set padding/border for vbox
+      vbox.setStyle("-fx-padding: 10;" + "-fx-border-style: solid inside;" + "-fx-border-width: 2;" + "-fx-border-insets: 5;" + "-fx-border-radius: 5;" + "-fx-border-color: red;");
+      
+      //Create the scene, add it, set title, and display
+      Scene scene = new Scene(vbox);
+      stage.setScene(scene);
+      stage.setTitle("Keylogger");
+      stage.show();
+   }
+   
+   //Helper method for the event
+   public void handleEvent(KeyEvent e){
+      String type = e.getEventType().getName();
+      KeyCode keyCode = e.getCode();
+      textBoxArea.appendText(type + ": Key Code =" + keyCode.getName() + ", Text =" + e.getText()+ "\n");
+   }
+      
+}
