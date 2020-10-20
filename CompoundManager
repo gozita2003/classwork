@@ -1,0 +1,146 @@
+package Compounds;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+
+public class CompoundManager {
+    private List<Compound> compounds;
+    private HashMap<String, Compound> compoundMap = new HashMap<String, Compound>();
+    String file;
+
+    public CompoundManager(String cFile) {
+        this.file = cFile;
+        readComps(file);
+    }
+
+    //read all known compounds from text file
+    private List<Compound> readComps(String filename) {
+        compounds = new ArrayList<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(filename));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                //System.out.println(line);
+                String temp[] = line.split(",");
+                Compound c = new Compound(temp[0], temp[1], Double.parseDouble(temp[2]));
+                System.out.println(c.getFormula() + " -- Hill Notation --> " + c.getHillFormula());
+                compounds.add(c);
+            }
+            br.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return compounds;
+    }
+
+    //store all known compounds in text file
+    public boolean saveComps() {
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+            for (Compound c : compounds) {
+                bw.write(c.getName() + "," + c.getFormula() + "," + String.valueOf(c.getMass()) + "\n");
+            }
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    //This creates a compound if it does not exist
+    public boolean createComp(String compName, String compFormula) {
+        boolean isFound = false;
+        Compound comp;
+        for (Compound c : compounds) {
+            if (c.getFormula().equals(compFormula) || c.getName().equals(compName)) {
+                isFound = true;
+            }
+        }
+        if (!isFound) {
+            comp = new Compound(compName, compFormula);
+            compounds.add(comp);
+        } else {
+            return true;
+        }
+
+
+        saveComps();
+        return false;
+    }
+
+    //Returns the compound based on the name (i.e., Water returns H2O)
+    public String getCompoundByName(String name) {
+        for (Compound c : compounds) {
+            if (c.getName().equals(name)) {
+                return c.toString();
+            }
+        }
+        return "";
+    }
+
+    public String toString() {
+        String str = "";
+        for (int i = 0; i < compounds.size(); i++) {
+            str += compounds.get(i).toString() + "\n";
+        }
+        return str;
+    }
+
+    //Puts items in order based on the qualifying factor
+    public String getOrder(String str) {
+        Collections.sort(compounds, new SortByFormula());
+
+        if (str.equals("Hill Formula")) {
+            Collections.sort(compounds, new SortByHillFormula());
+        } else if (str.equals("Mass")) {
+            Collections.sort(compounds, new SortByMass());
+        } else if (str.equals("Name")) {
+            Collections.sort(compounds, new SortByName());
+        }
+        String results = "";
+        for (int i = 0; i < compounds.size(); i++) {
+            results += compounds.get(i).toString();
+        }
+        return results;
+    }
+
+	/*public Compound getCompound(String symbol) {
+		return compoundMap.get(symbol);
+	}*/
+}
+
+class SortByName implements Comparator<Compound> {
+    public int compare(Compound a, Compound b) {
+        return a.getName().compareTo(b.getName());
+    }
+}
+
+class SortByFormula implements Comparator<Compound> {
+    public int compare(Compound a, Compound b) {
+        return a.getFormula().compareTo(b.getFormula());
+    }
+}
+
+
+class SortByMass implements Comparator<Compound> {
+    public int compare(Compound a, Compound b) {
+        if (a.getMass() < b.getMass()) return -1;
+        if (a.getMass() > b.getMass()) return 1;
+        return 0;
+    }
+}
+
+class SortByHillFormula implements Comparator<Compound> {
+    public int compare(Compound a, Compound b) {
+        return a.getHillFormula().compareTo(b.getHillFormula());
+    }
+}
+
+
