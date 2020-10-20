@@ -1,0 +1,92 @@
+import java.lang.Thread;
+import java.lang.*;
+import java.io.*;
+
+class Main{
+   //Variable to hold the array
+   static int[][]A;
+   static int[][]B;
+   static int[][]P;
+   
+   class Worker implements Runnable{
+   int row;
+   int col;
+   
+      //Parameter and thread caulating values for row and column
+      Worker(int row, int col){
+         this.row = row;
+         this.col = col;
+      }
+   
+      public void run(){
+         System.out.println("Thread < "+ row + " " + col + ">start calculation");
+         int sum = 0;
+         for (int i = 0; i < A[0].length; i++){
+            sum += (A[row][i] * B[col][i]);
+         }
+         P[row][col] = sum;
+         System.out.println("Thread <" + row + " " + col + "> returns <" + P[row][col]+ ">");
+         }
+      }
+      
+      public static void main (String[] args) throws IOException, InterruptedException{
+         //First command line argument
+         File file = new File(args[0]);
+         BufferedReader br = new BufferedReader(new FileReader(file));
+         
+         //Read row and column both for the matrix
+         int A_row, A_col, B_row, B_col;
+         String[] input = br.readLine().trim().split(" ");
+         
+         //Convert values into int
+         A_row = Integer.parseInt(input[0]);
+         A_col = Integer.parseInt(input[1]);
+         B_row = Integer.parseInt(input[2]);
+         B_col = Integer.parseInt(input[3]);
+         
+         A = new int[A_row][A_col];
+         B = new int[B_row][B_col];
+         P = new int[A_row][B_row];
+         
+         //Read the matrices
+         for (int i = 0; i < A_row; i++){
+            input = br.readLine().trim().split(" ");
+            for (int j = 0; j < A_col; j++){
+               A[i][j] = Integer.parseInt(input[j]);
+            }
+         }
+         
+         br.readLine();
+         for (int i = 0; i < B_row; i++){
+            input = br.readLine().trim().split(" ");
+            for (int j = 0; j < B_col; j++){
+               B[i][j] = Integer.parseInt(input[j]);
+            }
+         }
+         
+         Thread[][] threads = new Thread[A.length][B.length];
+         Main main = new Main();
+         for (int row = 0; row < A.length; row ++){
+            for (int col = 0; col < B.length; col++){
+               threads[row][col] = new Thread (main.new Worker(row,col));
+               threads[row][col].start();
+            }
+         }
+         
+         for(int row = 0; row < A.length; row++){
+            for(int col = 0; col < B.length; col++){
+               //Wait for the thread to finish all work
+               threads[row][col].join();
+            }
+         }
+         
+         //Print the result
+         for (int[] row : P){
+            for (int val : row){
+               System.out.print(val+ " ");
+            }
+            System.out.println();
+         }
+    }
+}
+   
