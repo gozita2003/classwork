@@ -1,0 +1,121 @@
+package elementInfo;
+
+public class Element {
+	private int atomicNum = 0;
+	private double atomicMass = 0;
+	private String name = "";
+	private String symbol = "";
+	private String state = "";
+	private String group = "";
+	
+	public Element(int atomicNum, String name, String symbol, double atomicMass, String state, String group) {
+		this.atomicNum = atomicNum;
+		this.atomicMass = atomicMass;
+		this.name = name;
+		this.symbol = symbol;
+		setState(state);
+		setGroup(group);
+	}
+	
+	public String toString() {
+		
+		return String.format("%d \t %-10s \t %s \t %.4f \t %-10s \t %-5s \n", atomicNum, name, symbol, atomicMass, state, group);
+	}
+	
+	public int getAtomicNum() {
+		return atomicNum;
+	}
+
+	public void setAtomicNum(int atomicNum) {
+		this.atomicNum = atomicNum;
+	}
+
+	public double getAtomicMass() {
+		return atomicMass;
+	}
+
+	public void setAtomicMass(double atomicMass) {
+		this.atomicMass = atomicMass;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSymbol() {
+		return symbol;
+	}
+
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
+	}
+	
+	public String getState() {
+		return state;
+	}
+	
+	//Sets the state for each element
+	public void setState(String state) {
+		if(state.equals("1")) {
+			this.state = "Solid";
+		}
+		else if(state.equals("2")) {
+			this.state = "Liquid";
+		}
+		else if(state.equals("3")) {
+			this.state = "Gas";
+		}
+		else if(state.equals("4")) {
+			this.state = "Unknown";
+		}
+		else {
+			this.state = state;
+		}
+	}
+
+	//Returns the group
+	public String getGroup() {
+		return group;
+	}
+
+	//Sets the group for each element
+	public void setGroup(String group) {
+		if(group.equals("1")) {
+			this.group = "Alkali Metal";
+		}
+		else if(group.equals("2")) {
+			this.group = "Alkaline Earth Metal";
+		}
+		else if(group.equals("3")) {
+			this.group = "Lanthanoid";
+		}
+		else if(group.equals("4")) {
+			this.group = "Actinoid";
+		}
+		else if(group.equals("5")) {
+			this.group = "Transition Metal";
+		}
+		else if(group.equals("6")) {
+			this.group = "Post-transition Metal";
+		}
+		else if(group.equals("7")) {
+			this.group = "Metalloid";
+		}
+		else if(group.equals("8")) {
+			this.group = "Reactive Nonmetal";
+		}
+		else if(group.equals("9")) {
+			this.group = "Noble Gas";
+		}
+		else if(group.equals("10")) {
+			this.group = "Unknown";
+		}
+		else {
+			this.group = group;
+		}
+	}
+}
