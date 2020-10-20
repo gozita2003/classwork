@@ -1,0 +1,22 @@
+public class endToEndDelay{
+   public static void main(String[] args){
+      
+      int L = 16;
+      int R = 4;
+      
+      System.out.println("The message size is " + L + "kbps and the transmission rate is " + R + "kbps.");
+      
+      int transmissionDelay = (L / R);
+      System.out.println("The transmission delay is " + transmissionDelay + " second(s).");
+      
+      int endToEnd = (transmissionDelay * 3);
+      System.out.println("The end-to-end delay is " + endToEnd + " second(s).");
+      
+      System.out.println("Each packet is " + (L / R) + "kb total.");
+      System.out.println("");
+      System.out.println("Packet size =       " + (L / R) +" kb");
+      System.out.println("End-to-end delay = " + endToEnd +" second(s)");
+      
+
+   }
+}
