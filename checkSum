@@ -1,0 +1,117 @@
+import java.io.*;
+import java.util.*;
+
+public class Upc{
+    public static void main (String[] args) throws Exception{
+    
+        //Scan the File
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Enter file location: ");
+        String file = scanner.nextLine();
+        
+        
+        //Create a Buffered Reader to read the File
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        
+        String string;
+        
+        //Array list to store file contents
+        ArrayList<String> checkList = new ArrayList<String>();
+        //Array list for UPCS 
+        ArrayList<String> upc = new ArrayList<String>();
+        //Array for ISBNs
+        ArrayList<String> isbn = new ArrayList<String>();
+        
+        //Add contents of file to the Check list
+        while ((string = br.readLine() != null){
+            checkList.add(string);
+        }
+        
+        //Put UPCS into the UPC ArrayList
+        for(String num : checkList){
+            if (num.length() == 12){
+                    upc.add(num);
+            }
+            else if (num.length() == 13){
+                isbn.add(num);
+            }
+        }
+        
+        //Go through the UPC ArrayList
+        for (String u : upc){
+                int evenSum = 0, oddSum = 0, total = 0, check = 0;
+                int upcNum[] = new int[u.length()];
+                
+                //Make an array to parse into int
+                for {
+                    upcNum[i] = u.charAt(i) - 48;
+                }
+                
+                //Caculate sums of odd and even
+                for (int i = 0; i < u.length() - 1; i++){
+                    if (i % 2 != 0){
+                        evenSum += upcNum[i];
+                    }
+                    else{
+                        oddSum += upcNum[i];
+                    }
+                }
+                oddSum *= 3;
+                //Caculate total
+                total = oddSum + evenSum;
+                //Caculate check value
+                if (total % 10 == 0){
+                    check = 0;
+                }
+                else{
+                    check = 10 - (total % 10);
+                }
+                
+                //Is check value same as last digit?
+                if (check == upcNum[u.length() - 1]){
+                    //Print valid if yes
+                    System.out.println("The UPC Number " + u + " is valid.");
+                }
+                else{
+                    //Print invalid if No
+                    System.out.println("The UPC Number " + u + " is invalid.");
+                }
+        }
+        
+        //Go through ISBN ArrayList
+        for (String is : isbn){
+            int total = 0, check = 0;
+            int isbnNum[] = new int[is.length()];
+            
+            //Parse into int
+            for (int i = 0; i < is.length(); i++){
+                isbnNum[i] = is.charAt(i) - 48;
+            }
+            
+            //Calculate total
+            for (int i = 0; i < is.length() - 1; i++){
+                if (i % 2 != 0){
+                    total += isbnNum[i] * 3;
+                }
+            }
+            //Calculate check
+            if (total % 10 == 0){
+                check = 0;
+            }
+            else{
+                check = 10 - (total %10);
+            }
+            
+            //Check if check value is same as the last digit
+            if (check == isbnNum[is.length() - 1]){
+                //Print valid if yes
+                System.out.println("The ISBN number " + is + " is valid.");
+            }
+            else{
+                //Print invalid if No
+                System.out.println("The ISBN number " + is + " not valid.");
+            }
+            }
+        
+    }
+}
