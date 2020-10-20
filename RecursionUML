@@ -1,0 +1,71 @@
+Recursion6	
++ counts:int	To be used to count comparisons
+
++Recursion6
+
++populateEvenList(list: Integer[]):void
+
++populateOddList(list: Integer[]): void
+
++cloneList(list: Integer[]):Integer[]
+
++shuffleList(list:Integer []):void
+
++SelectionSort(list: Integer[]):int
+
+
++quickSort(list: Integer[]):int
+
+
+-quickSort(list: Integer[], first:int, last: int):void
+
+
+-partition(list:Integer[], first:int, last:int):int
+
+
++linearSearch(list1:Integer[],list2:Integer[]):int 
+
+
+
++recursiveBinarySearch(list1:Integer[], list2:Integer[]): int
+
+
+-recursiveBinarySearch(list:Integer[], key:Integer, low:int, high:int):void
+
+
++displayList(list:Integer[]):void
+
++recursiveMax(list: Integer[]):Integer
+
++recursiveBackward(list:Integer[]);void	No-argument constructor
+
+Populate the array with even values starting with 0
+
+Populate the array with odd values starting with 1
+
+Clone list and return its clone
+
+Shuffle the list. You may use Collections shuffle
+
+Use selection sort to sort the list. count and return the number of comparisons
+
+Use quick sort to sort the list.  count and return the number of comparisons
+
+Private method to help 
+
+
+Private helper method to find and return the partition index
+
+Searches for all numbers in lst1 in list2 and counts the number of comparisons made. When done, returns the number of comparisons. 
+
+Implement recursiveBinarySearch. List2 is sorted. Search for all values in list1 against list2. Count number of comparisons. 
+
+Private method that is invoked from the public recursiveBinarySearch method. Increments number of comparisons.
+
+Receives and array. It displays its values 8 per line.
+
+Receives and array and returns the largest
+
+Receives and array and prints its values in backward order.
+
+
