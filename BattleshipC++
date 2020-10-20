@@ -1,0 +1,208 @@
+#include <stdio.h>
+#include <stdlib.h> //Allows use of the random function
+#include <time.h>
+
+void setBoard(int *Board){
+	int index1, index2, test;
+
+	//do/while loop to make sure inputs are proper
+	do{
+	//Accept input for first ship position
+	printf("Enter the first position\t");
+	scanf("%d", &index1);
+
+	//Accept input for the second ship position
+	printf("Enter the second position\t");
+	scanf("%d", &index2);
+
+	//Make sure these selections are in range of the board
+	if((index1 >= 0 && index1 <= 9) && (index2 >= 0 && index2 <= 9) && (index1 != index2)){
+		Board[index1] = 1;
+		Board[index2] = 1;
+		test = 1;
+	}
+	else{
+		printf("Invalid input. Please try again.\n");
+	}
+	} while(test == 0);
+}
+	
+
+//Pick a random number with the random function.
+//Random position where will be there the computer puts its ships
+void setComputerBoard(int *CBoard){
+	int r = rand() % 9; //Check for a number been 0 to 8 (inclusive)
+	CBoard[r] = 1;
+	CBoard[r + 1] = 1;
+}
+
+//Start the game
+int playGame(int *Board, int *CBoard){
+	int guess, pick, i, sumH, sumC;
+
+	//Array H to store value 1 if hit by human
+	int H[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	//Array C to store value 1 if hit by computer
+	int C[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	//Run an infinite while loop until there is a winner
+	while (1){
+		pick = rand() % 10;
+		//Pick and store the computer's guess
+		printf("Computer Guess: %d\n", pick);
+
+		if(Board[pick] == 1){
+			printf("HIT!\n");
+			//Store 1 to C array to identify position hit by comp
+			C[pick] = 1;
+		}
+		else{
+			printf("MISS!\n");	
+			C[pick] = 2;
+		}
+		
+		//Print out the human board
+		printf("Human Board: \n");
+		for(i = 0; i < 10; i++)
+			printf("%d", i);
+			printf("\n");
+			for(i = 0; i < 10; i++){
+				if(C[i] > 0){
+					//Check if hit or miss
+					if(Board[i] == 0) //Miss
+						printf("M");
+					if(Board[i] == 1) //Hit
+						printf("H");
+				}
+				else{
+					if(Board[i] == 0)
+						printf("*");
+					if(Board[i] == 1)
+						printf("S");
+				}
+			}
+			printf("\n");
+		
+		//Print out computer board
+		printf("Computer Board: \n");
+		for(i = 0; i < 10; i++)
+			printf("%d", i);
+			printf("\n");
+		
+		for(i = 0; i < 10; i++){
+			if(CBoard[i] == 0) 
+				printf("*");
+			if(CBoard[i] == 1) 
+				printf("S");
+		}
+		printf("\n");
+
+		//Take user guess and store
+		printf("Enter your guess: ");
+		scanf("%d", &guess);
+		printf("Your guess: %d\n", guess);
+
+		if(CBoard[guess] == 1){
+			printf("HIT\n");
+			//Store 1 to array to declare hit by human
+			H[guess] = 1;
+		}
+		else{
+			printf("MISS!\n");
+			H[guess] = 2;
+		}
+
+		//Human board after human guesses
+		printf("Human Board: \n");
+		for(i = 0; i < 10; i++)
+			printf("%d", i);
+			printf("\n");
+
+		for(i = 0; i < 10; i++){
+			if(C[i] > 0){
+				if(Board[i] == 0) //Miss
+					printf("M");
+				if(Board[i] == 1) //Hit
+					printf("H");
+			}
+			else{
+				if(Board[i] == 0)
+					printf("*");
+				if(Board[i] == 1)
+					printf("S");
+		}
+	}
+	printf("\n");
+
+	//Computer board after human guess
+	printf("Computer Board: \n");
+	for(i = 0; i <10; i++)
+		printf("%d", i);
+		printf("\n");
+
+	for(i = 0; i < 10; i++){
+		if(H[i] > 0){
+			//Check for hit or miss
+			if(CBoard[i] == 0) //Miss
+				printf("M");
+			if(CBoard[i] == 1) //Hit
+				printf("H");
+		}
+		else{
+			if(CBoard[i] == 0)
+				printf("*");
+			if(CBoard[i] == 1)
+				printf("S");
+		}
+	}
+	printf("\n\n\n");
+
+	//SumH counts in H array
+	//SumC counts in C array
+	//When both H or C are 1 denoting a win, then sumH or sumC will be 2
+	sumH = 0;
+	sumC = 0;
+
+	for(i = 0; i < 10; i++){
+		if(H[i] == 1) 
+			sumH = sumH + H[i];
+		if(C[i] == 1)
+			sumC = sumC + C[i];
+	}
+	
+	if(sumH == 2)
+		return 1; //Human wins
+	if(sumC == 2)
+		return 0; //Computer wins
+	}
+}
+
+int main(void){
+	//Initalize human board
+	int *Board = (int*) malloc(10 * sizeof(int));
+
+	//Initalize computer board with random positions
+	int *CBoard = (int*) malloc(10 * sizeof(int));
+
+	int i;
+
+	for(i = 0; i < 10; i++){
+		Board[i] = 0;
+		CBoard[i] = 0;
+	}
+
+	int win;
+	setBoard(Board);
+
+	srand(time(0)); //Random function
+	setComputerBoard(CBoard);
+
+	win = playGame(Board, CBoard);
+
+	if(win == 0)
+		printf("Computer wins!\n");
+	else
+		printf("Human wins!\n");
+	
+	return 0;
+}
