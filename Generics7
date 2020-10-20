@@ -1,0 +1,96 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
+
+public class Generics7<E>{
+
+   //No argument constructor//
+   public Generics7(){
+      
+      }
+   
+   //Recieves a one dimensional array and returns the maximum value//
+   public <E extends Comparable<E>> E max(E[] list){
+      E max = list[0];
+      for(int i = 1; i < list.length; i++){
+         E el = list[i];
+         if(el.compareTo(max) > 0){
+            max = el;
+         }
+      }
+      return max;
+   }
+   
+   //Binary Search to return the location of the key or return negative if not found//
+   public <E extends Comparable<E>> int binarySearch(E[] list, E key){
+      int low = 0;
+      int high = list.length -1;
+      return binarySearch(list, key, low, high);
+   }
+   
+   public <E extends Comparable<E>> int binarySearch(E[] list, E key, int low, int high){
+      while (high >= low){
+         int mid = (high + low) / 2;
+         if (key.compareTo(list[mid]) > 0){
+            return binarySearch(list, key, mid + 1, high);
+         }
+         if (list[mid].compareTo(key) == 0){
+            return mid;
+         }
+         if (key.compareTo(list[mid]) < 0){
+            return binarySearch(list, key, low, mid -1);
+         }
+      }
+      return -1;
+   }
+   
+   public <E extends Comparable<E>> int linearSearch(E[] list, E key){
+      for(int i = 0; i < list.length; i++){
+         if(key == list[i]){
+            return i;
+         }
+      } 
+      return -1;  
+   }
+   
+   
+//   public <E> void shuffle(ArrayList<E> list){
+//      Collections.shuffle(list);
+//   }
+//   
+//   public <E> void shuffle(E[] list){
+//      Collections.shuffle(list);
+//   }
+   
+   //Display array lists
+   public <E> void displayList(ArrayList <E> list){
+      for (int i = 0; i < list.size(); i++){
+         System.out.print("\t" + list.get(i) + " ");
+      }
+      System.out.println();
+   }
+   
+   //Display list
+   public <E> void displayList(E[] list){
+      for (int i = 0; i < list.length; i++){
+         System.out.print("\t" + list[i] + " ");
+      }
+      System.out.println();
+   }
+   
+   //Selection sort
+   public <E extends Comparable<E>> void selectionSort(E[] list){
+      for (int i = 0; i < list.length - 1; i++){
+      Integer index = i;
+         for (int j = i + 1; j < list.length; j++){
+            if (list[j].compareTo(list[index]) < 0)
+               index = j;
+         }
+         E smallerNumber = list[index];
+         list[index] = list[i];
+         list[i] = smallerNumber;
+      }
+   }
+ 
+}
