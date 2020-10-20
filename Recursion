@@ -1,0 +1,177 @@
+import java.util.*;
+
+class Recursion6{
+	int count = 0;
+	
+	public Recursion6(){
+		
+	}
+
+	//Create a list of Odd Integers only
+	public void populateOddList(Integer[] oddList){
+		int index = 0; 
+		int currentOdd = 1;
+		
+		while(index < oddList.length){
+			oddList[index] = currentOdd;
+			index++;
+			currentOdd += 2;
+		}
+	}
+
+	//Create a list of Even Integers Only
+	public void populateEvenList(Integer[] evenList){
+		for (int i = 0; i < evenList.length; i++) {
+			evenList[i] = i * 2;
+		}
+	}
+	
+	//Clones the List
+	public Integer[] cloneList(Integer[] list){
+		Integer[] randomOddList = list.clone();
+		return randomOddList;
+	}
+	
+	//Shuffles the List
+	public void shuffleList(Integer[] list){
+		
+		Collections.shuffle(Arrays.asList(list)); 
+	}
+
+	//Selection Sort
+	public int selectionSort(Integer[] list){
+		int count = 0;
+		for (int p = 1; p < list.length; p++){
+			int min = list[p];
+			int minLoc = p;
+			count++;
+		for (int i = p + 1; i < list.length; i++){
+			if(list[i] < min){
+				min = list[i];
+				minLoc = i;
+				count++;
+			}
+		}
+
+		int temp = list[p];
+		list[p] = min;
+		list[minLoc] = temp;
+		}
+		return count;
+	}
+	
+	//QuickSort
+	public void quickSort(Integer[] list) {
+		quickSort(list, 0, list.length - 1);
+	}
+	
+	//QuickSort HelperMethod
+	private void quickSort(Integer[] list, int first, int last) {
+		if (last > first) {
+			int pivotIndex = partition(list, first, last);
+			quickSort(list, first, pivotIndex - 1);
+			quickSort(list, pivotIndex + 1, last);
+		}
+	}
+	
+	//Find Partition Index
+	private int partition(Integer[] list, int first, int last){
+		int pivot = list[first];
+		int low = first + 1;
+		int high = last;
+
+		while (high > low) {
+			while (low <= high && list[low] <= pivot)
+				low++;
+			while (low <= high && list[high] > pivot)
+				high--;
+
+			if (high > low) {
+				int temp = list[high];
+				list[high] = list[low];
+				list[low] = temp;
+			}
+		}
+		while (high > first && list[high] >= pivot)
+			high--;
+
+			if (pivot > list[high]) {
+				list[first] = list[high];
+				list[high] = pivot;
+				return high;
+			}
+			else {
+				return first;
+		}
+	}
+	
+	public int linearSearch(Integer[] list1, Integer[] list2){
+		int count = 0;
+		for (int i = 0; i < list1.length; i++) {
+			for (int a = 0; a < list2.length; a++) {
+				count++;
+				if(list1[i] == list2[a])
+					break;
+			}
+		}
+		return count;
+	}
+	
+	//Recursive Binary Search
+//	private int recursiveBinarySearch(Integer[] list1, Integer[] list2){
+//		
+//		}
+	
+	//Increment count for comparisons for Recursive Binary Search
+	//Increase the count still
+	public int recursiveBinarySearch(Integer[] list, int key, int low, int high){
+		if (low > high)  
+			return -low - 1;
+
+		int mid = (low + high) / 2;
+		
+		if (key < list[mid])
+			return recursiveBinarySearch(list, key, low, mid - 1);
+		else if (key == list[mid])
+			return mid;
+		else
+			return recursiveBinarySearch(list, key, mid + 1, high);
+	}
+
+	//Display List
+	public void displayList(Integer[] list){
+		for (int i = 0; i < list.length; i++) {
+		System.out.print(list[i] + " ");
+         if((i + 1) % 8 == 0)
+            System.out.printf("\n");
+         else
+            System.out.printf("\t");
+		}
+	}
+	
+	//Recursive method to find the Maximum Integer
+	public static int recursiveMax(Integer[] list) {
+		return recursiveMax(list, 0);
+	}
+	
+	private static int recursiveMax(Integer[] list, int i) {
+		return i < list.length
+			? Math.max(list[i], recursiveMax(list, i + 1))
+			: Integer.MIN_VALUE;
+	}
+	
+	//Recursive method to return the array backwards
+	public void recursiveBackward(Integer[] list){
+		recursiveBackward(list, 0, list.length - 1);
+	}
+
+	void recursiveBackward(Integer[] list, int start, int end){
+		int temp;
+		if(start >= end)
+			return;
+				temp = list[start];   
+				list[start] = list[end];
+				list[end] = temp;
+				recursiveBackward(list, start + 1, end - 1);   
+	} 
+}
