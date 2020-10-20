@@ -1,0 +1,60 @@
+
+import java.io.*;
+import java.util.*;
+
+
+public class Encrypt{
+
+   public static char rot_encrypt(char c, int n){
+      if (c >= 'a' && c <= 'z')
+         return (char)('a' + (c - 'a' + n) % 26);
+      else if (c >= 'A' && c <= 'Z')
+         return (char)('A' + (c - 'A' + n) % 26);
+      else
+         return c;
+   }
+   
+   public static void main(String[] args) throws Exception{
+      
+      
+      
+      if(args.length != 2){
+         System.out.println("Need two arguments");
+         System.exit(1);
+      }
+         
+      int rot = Integer.parseInt(args[1]);
+      
+      BufferedReader br = new BufferedReader(new FileReader(args[0]));
+      String string;
+      
+      ArrayList<String> crypt = new ArrayList<String>();
+      
+      while((string = br.readLine()) != null && string.length() == 0){
+         crypt.add(string);
+      }
+      
+      StringBuilder sb1 = new StringBuilder();
+      
+      for(String s : crypt){
+         sb1.append(s);
+      }
+      
+      String source_text = sb1.toString();
+      
+      StringBuilder sb2 = new StringBuilder();
+      
+      for(char ch : string.toCharArray()){
+         sb2.append(rot_encrypt(ch, rot));
+      }
+      
+      String encoded_text = sb2.toString();
+      
+      String output_path = args[0] + ".ciphertext.txt";
+      FileWriter fw = new FileWriter(output_path);
+         fw.write(encoded_text);
+         fw.close();
+         
+      return;
+   }
+}
