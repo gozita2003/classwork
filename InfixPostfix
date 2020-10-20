@@ -1,0 +1,93 @@
+import java.util.Stack;
+
+public class MyInfixPostix8{
+   public static void main(String[] args){
+   
+   int index;
+   
+   //Check the length of the arguments
+   if(args.length < 1){
+      System.out.println("Length of the expression is zero.");
+      System.exit(1);
+   }
+   
+   String expression = "";
+   
+   for(index = 0; index < args.length; index++){
+      expression += args[index];
+   }
+   
+   System.out.println(expression);
+   
+   try{
+      System.out.println(infixToPostfix(expression));
+   }
+   catch(Exception ex){
+      System.out.println("Wrong expression.");
+   }
+}
+
+   public static String infixToPostfix(String expression){
+      //Result expression
+      String ResultExpression = "";
+      
+      //Initalize empty character stack
+      Stack<Character> Stack4OPerator = new Stack<Character>();
+      
+      //Extract operands and operators with delimiting characters
+      java.util.StringTokenizer tokens = new java.util.StringTokenizer(expression, "()+-/*%^", true);
+      
+      //Scan through tokens
+      while(tokens.hasMoreTokens()){
+         //Extract a token and remove spaces in the front and back
+         String token = tokens.nextToken().trim();
+         if(token.charAt(0) == '+' ||
+            token.charAt(0) == '-' ||
+            token.charAt(0) == '*' ||
+            token.charAt(0) == '/' ||
+            token.charAt(0) == '%' ||
+            token.charAt(0) == '^'){
+               //Process all in the top of the operator stack
+               while(!Stack4OPerator.isEmpty() &&
+                      (Stack4OPerator.peek() == ('+') ||
+                       Stack4OPerator.peek() == ('-') ||
+                       Stack4OPerator.peek() == ('*') ||
+                       Stack4OPerator.peek() == ('/') ||
+                       Stack4OPerator.peek() == ('%') ||
+                       Stack4OPerator.peek() == ('^'))){
+                        //Update in result expression by popping
+                        ResultExpression += Stack4OPerator.pop() + " ";
+                      }
+                      //Push the  operator into the operator stack
+                      Stack4OPerator.push(new Character(token.charAt(0)));
+             }
+           
+           else if (token.trim().charAt(0) == '('){
+               //Push '(' to stack
+               Stack4OPerator.push(new Character('('));
+           }
+           
+           else if (token.trim().charAt(0) == ')'){
+               //Process all operators in stack until getting '('
+               while(Stack4OPerator.peek() != ('(')){
+                  ResultExpression += Stack4OPerator.pop + " ";
+               }
+               //Pop '(' from the stack
+               Stack4OPerator.pop();
+           }
+           
+           //An operand recieved Push
+           else{
+               ResultExpression += token + " ";
+           }
+      }
+      
+      //Process all operators in the Stack
+      while(!Stack4OPerator.isEmpty()){
+         ResultExpression += Stack4OPerator.pop() + " ";
+      }
+      
+      //Return result
+      return ResultExpression;
+   }
+ }
