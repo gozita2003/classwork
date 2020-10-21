@@ -24,7 +24,7 @@ public class keylogger extends Application{
    public void start(Stage stage){
       
       //Create a name for the text entry area
-      Label textName = new Label("Name: ");
+      Label textName = new Label("Text Input: ");
       //Create the actual text field
       TextField textField = new TextField();
       
@@ -46,21 +46,20 @@ public class keylogger extends Application{
       
       //Add the key pressed and released
       textField.setOnKeyTyped(new EventHandler<KeyEvent>(){
-         
          public void handle (final KeyEvent keyEvent){
-            handleEvent(keyEvent);
+            textBoxArea.appendText("Character output: " + keyEvent.getCharacter() + "\n\n");
          }
       });
       
        textField.setOnKeyPressed(new EventHandler<KeyEvent>(){
          public void handle(final KeyEvent keyEvent){
-            handleEvent(keyEvent);
+            textBoxArea.appendText("Key Pressed: " + keyEvent.getCode() + "\n\n");
          }
       });
       
       textField.setOnKeyReleased(new EventHandler<KeyEvent>(){
          public void handle(final KeyEvent keyEvent){
-            handleEvent(keyEvent);
+            textBoxArea.appendText("Key Released: " + keyEvent.getCode() + "\n\n");
          }
       });
       
@@ -72,13 +71,6 @@ public class keylogger extends Application{
       stage.setScene(scene);
       stage.setTitle("Keylogger");
       stage.show();
-   }
-   
-   //Helper method for the event
-   public void handleEvent(KeyEvent e){
-      String type = e.getEventType().getName();
-      KeyCode keyCode = e.getCode();
-      textBoxArea.appendText(type + ": Key Code =" + keyCode.getName() + ", Text =" + e.getText()+ "\n");
    }
       
 }
