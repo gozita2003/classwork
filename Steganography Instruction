@@ -1,1 +1,24 @@
-Steganography is the technique of hiding secret messages/information within other non-secret data/information. One popular way of steganography is hiding text within images, as discussed in class.In this pair-programmingassignment you are required to write a Java program that can embed and extract simple text message into a chosen PNG image, following the strategy discussed in class. The program should also allowextractingthe message from the stego image. In particular, the program should do the following:1.Prompt user for ‘hiding’and ‘extract’options.2.When ‘hiding’option chosen,prompts user to enter aPNG image as a “cover”to hide a text message.3.Prompts user to enter the text message that is to be hidden.4.Create a modified image after hiding the text message (as explained in class) and save the image as a new PNG picture.5.When ‘extract’option is chosen, prompts user for a stego image that has some text already hidden through your program. Display the hidden message whenthestegoPNG image is supplied. [For testing purpose, the usermay choose to use a different image file that already has a message hidden into itusing the same program.](Note: before ‘hiding’it may be useful check how many characters can be embedded in the image. Similarly, when ‘extracting’you should displaying only the text that was hidden.)[Hint:a sample Java code is provided on BlazeVIEW to give an idea how to get R, G, Bvalues of a pixel in a PNG image. Youneed to explore BufferedImageclass, Colorclass, ImageIOpackage, getRGB(), setRGB()methods,etc., from Java API.][This program is simple in terms of coding complexity (use of simple loops and arrays), but the logic (design of the steps) should be carefully thought of. Also, it is important to use the Java API methods appropriately. ]
+Steganography is the technique of hiding secret messages/information within other non-secret data/information. 
+One popular way of steganography is hiding text within images, as discussed in class
+
+In this pair-programmin gassignment you are required to write a Java program that can embed and extract simple text message into a chosen PNG image, 
+following the strategy discussed in class. The program should also allowextractingthe message from the stego image. 
+In particular, the program should do the following:
+
+
+1.Prompt user for ‘hiding’and ‘extract’options
+2.When ‘hiding’option chosen,prompts user to enter aPNG image as a “cover”to hide a text message
+3.Prompts user to enter the text message that is to be hidden.
+4.Create a modified image after hiding the text message (as explained in class) and save the image as a new PNG picture
+5.When ‘extract’option is chosen, prompts user for a stego image that has some text already hidden through your program. 
+  Display the hidden message whenthestegoPNG image is supplied. [For testing purpose, the usermay choose to use a different image 
+  file that already has a message hidden into itusing the same program.]
+  
+(Note: before ‘hiding’it may be useful check how many characters can be embedded in the image. 
+Similarly, when ‘extracting’you should displaying only the text that was hidden.)
+
+[Hint:a sample Java code is provided on BlazeVIEW to give an idea how to get R, G, Bvalues of a pixel in a PNG image. 
+You need to explore BufferedImageclass, Colorclass, ImageIOpackage, getRGB(), setRGB()methods,etc., from Java API.]
+
+[This program is simple in terms of coding complexity (use of simple loops and arrays), 
+but the logic (design of the steps) should be carefully thought of. Also, it is important to use the Java API methods appropriately. 
