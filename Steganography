@@ -8,6 +8,11 @@ import java.awt.image.BufferedImage;
 public class Hiding{
 
     public static void main(String[] args) {
+    
+        Scanner input1 = new Scanner(System.in);
+        System.out.print("Choose an option: (1) Read the text from an image \n (2) Write text to an image.")
+        String choice = input.nextLine();
+         
         Scanner input = new Scanner(System.in);
         System.out.print("Enter the input image file name: ");
         String file = input.nextLine();
