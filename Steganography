@@ -1,0 +1,127 @@
+import java.util.*;
+import java.io.*;
+import java.math.BigInteger;
+import javax.imageio.ImageIO;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+
+public class Hiding{
+   private static int[] pixel(BufferedImage img, int x, int y){
+      int argb = img.getRGB(x, y);
+      int[] rgb = new int[3];
+      rgb[0] = (argb >> 16) & 0xff; //For the red
+      rgb[1] = (argb >> 8) & 0xff; //For the green
+      rgb[2] = (argb) & 0xff; //For the blue
+      
+      //System.out.println("Red: " + rgb[0] + ", Green: " + rgb[1] + ", Blue: " + rgb[2]);
+      
+      return rgb;
+   }
+   
+   public static void main(String[] args){
+      Scanner input = new Scanner(System.in);
+      System.out.print("Enter the input image file name: ");
+      String file = input.nextLine();
+      String hiddenText = "";
+      System.out.println("Enter the text you wish to hide: ");
+      hiddenText = input.nextLine();
+      
+      String textToBinary = new BigInteger(hiddenText.getBytes()).toString(2);
+      BufferedImage img;
+      String savedImg;
+      
+      try{
+         img = ImageIO.read(new File(file));
+         int height = img.getHeight();
+         int width = img.getWidth();
+         
+         int[][] pixelData = new int[height * width][3];
+         int[] rgb;
+         int numOfPixels = 0;
+         for(int i = 0; i < height; i++){
+            for(int j = 0; j < width; j++){
+               rgb = pixel(img, j, i);
+               for(int k = 0; k < rgb.length; k++){
+                  pixelData[numOfPixels][k] = rgb[k];
+               }
+               numOfPixels++;
+            }
+         }
+         
+         //Put the text into the image and get the new image
+         savedImg = saveInImg(textToBinary, pixelData, height, width);
+         
+         //Extract the message from an image
+         String message = getMessage(savedImg);
+         
+         System.out.println("Extracted message is: " + message);
+      } catch(IOException e){
+         e.printStackTrace();
+      }
+   }
+   
+   private static String getMessage(String savedImg){
+      String hMessage = "";
+      String temp;
+      BufferedImage img;
+      
+      try{
+         img = ImageIO.read(new File(savedImg));
+         int height = img.getHeight();
+         int width = img.getWidth();
+         int[] rgb;
+         
+         for(int i = 0; i < height; i++){
+            for(int j = 0; j < width; j++){
+               rgb = pixel(img, j, i);
+               for(int k = 0; k < rgb.length; k++){
+                  temp = Integer.toBinaryString(rgb[k]);
+                  hMessage = hMessage + temp.charAt(temp.length() - 1);
+                  System.out.println(hMessage);
+               }
+            }
+         }
+         
+         int charCode = Integer.parseInt(hMessage, 2);
+         hMessage = new Character((char)charCode).toString();
+      } catch(IOException e){
+         e.printStackTrace();
+      }
+      
+      return hMessage;
+   }
+   
+   private static String saveInImg(String textToBinary, int[][] pixelData, int height, int width){
+      int i, j, newBit, rgb;
+      String temp, imgPath;
+      
+      imgPath = "C:\\test.png";
+      int pixelsReq = textToBinary.length() / 3;
+      for(i = 0; i < pixelsReq; i++){
+         for(j = 0; j < 3; j++){
+            temp = Integer.toBinaryString(pixelData[i][j]);
+            newBit = Integer.valueOf(temp.charAt(temp.length() - 1));
+            temp = temp.replace(temp.charAt(temp.length() -1), (char)newBit);
+            pixelData[i][j] = Integer.parseInt(temp, 2);
+         }
+      }
+      
+      BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+      int pixelNo = 0;
+      for(i = 0; i < height; i++){
+         for(j = 0; j < width; j++){
+            rgb = new Color (pixelData[pixelNo][0], pixelData[pixelNo][1], pixelData[pixelNo][2]).getRGB();
+            newImage.setRGB(j, i, rgb);
+            pixelNo++;
+         }
+      }
+      
+      try{
+         ImageIO.write(newImage, "png", new File(imgPath));
+      } catch(IOException e){
+         e.printStackTrace();
+      }
+      
+      return imgPath;
+   }
+}
