@@ -10,9 +10,16 @@ public class Hiding{
     public static void main(String[] args) {
     
         Scanner input1 = new Scanner(System.in);
-        System.out.print("Choose an option: (1) Read the text from an image \n (2) Write text to an image.")
+        System.out.print("Choose an option: (1) Read the text from an image \n (2) Write text to an image.");
         String choice = input.nextLine();
-         
+        
+        if(choice == 1){
+         return getMessage;
+        } else if(choice == 2){
+         return saveInImg;
+        } else{
+         System.out.println("Not a viable option. Please selection 1 or 2 as your option. Try again.");
+        }
         Scanner input = new Scanner(System.in);
         System.out.print("Enter the input image file name: ");
         String file = input.nextLine();
