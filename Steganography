@@ -1,3 +1,5 @@
+
+
 import java.util.*;
 import java.io.*;
 import java.math.BigInteger;
@@ -8,18 +10,18 @@ import java.awt.image.BufferedImage;
 public class Hiding{
 
     public static void main(String[] args) {
-    
-        Scanner input1 = new Scanner(System.in);
-        System.out.print("Choose an option: (1) Read the text from an image \n (2) Write text to an image.");
-        String choice = input.nextLine();
-        
-        if(choice == 1){
-         return getMessage;
-        } else if(choice == 2){
-         return saveInImg;
-        } else{
-         System.out.println("Not a viable option. Please selection 1 or 2 as your option. Try again.");
-        }
+
+//        Scanner input1 = new Scanner(System.in);
+//        System.out.print("Choose an option: (1) Read the text from an image \n (2) Write text to an image.");
+//        String choice = input.nextLine();
+//
+//        if(choice == 1){
+//            return getMessage;
+//        } else if(choice == 2){
+//            return saveInImg;
+//        } else{
+//            System.out.println("Not a viable option. Please selection 1 or 2 as your option. Try again.");
+//        }
         Scanner input = new Scanner(System.in);
         System.out.print("Enter the input image file name: ");
         String file = input.nextLine();
@@ -110,6 +112,11 @@ public class Hiding{
                         // extract message byte by byte to avoid parseInt overflows
                         if (count == 8) {
                             int charCode = Integer.parseInt(hChar, 2);
+                            //end of encrypted message
+                            if(charCode < 32 || charCode > 126){
+                              return hMessage;
+                            }
+                            
                             hMessage += new Character((char)charCode).toString();
                             hChar = "";
                             count = 0;
@@ -130,7 +137,7 @@ public class Hiding{
         int len = textToBinary.length();
         String temp, imgPath;
 
-        imgPath = "C:\\test.png";
+        imgPath = "test.png";
 
         // new and improved looping! :)
         for (int i=0; i<len; i++) {
