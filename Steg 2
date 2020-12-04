@@ -1,0 +1,180 @@
+/*
+Name: 
+Course: 
+Semester: 
+Assignment: 8
+*/
+
+import java.util.*;
+import java.io.*;
+import java.math.BigInteger;
+import javax.imageio.ImageIO;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+
+public class Hiding{
+
+    public static void main(String[] args) {
+      
+      Scanner input = new Scanner(System.in);
+      
+      System.out.print("Choose an option: (1) Read the text from an image \n (2) Write text to an image.");
+      Integer choice = Integer.parseInt(input.nextLine());
+      if (choice == 1) {
+         System.out.print("Enter the encoded image file name: ");
+         String file = input.nextLine();
+
+         //Extract the message from an image
+         String message = getMessage(file);
+         System.out.println("Extracted message is: " + message);
+         
+         
+      } else if (choice == 2) {
+         System.out.print("Enter the input image file name: ");
+         String filePath = input.nextLine();
+         String hiddenText = "";
+         System.out.println("Enter the text you wish to hide: ");
+         hiddenText = input.nextLine();
+         
+         
+                 // build binary representation of input while keeping leading zeros
+        StringBuilder sb = new StringBuilder();
+        byte[] bytes = hiddenText.getBytes();
+        for (byte b : bytes) {
+            int val = b;
+            for (int i = 0; i < 8; i++)
+            {
+                sb.append((val & 128) == 0 ? 0 : 1);
+                val <<= 1;
+            }
+        }
+         
+        String textToBinary = sb.toString();
+        System.out.println(textToBinary);
+        BufferedImage img;
+        String savedImg;
+        
+        
+
+        try{
+            img = ImageIO.read(new File(filePath));
+            int height = img.getHeight();
+            int width = img.getWidth();
+
+            int[][] pixelData = new int[height * width][3];
+            int[] rgb;
+            int numOfPixels = 0;
+            for(int i = 0; i < height; i++){
+                for(int j = 0; j < width; j++){
+                    rgb = pixel(img, j, i);
+                    for(int k = 0; k < rgb.length; k++){
+                        pixelData[numOfPixels][k] = rgb[k];
+                    }
+                    numOfPixels++;
+                }
+            }
+
+            //Put the text into the image and get the new image
+            savedImg = saveInImg(textToBinary, pixelData, height, width);
+            
+      } catch(Exception e){
+         e.printStackTrace();
+      }
+      
+    
+
+        }
+    }
+   
+
+    private static int[] pixel(BufferedImage img, int x, int y){
+        int argb = img.getRGB(x, y);
+        int[] rgb = new int[3];
+        rgb[0] = (argb >> 16) & 0xff; //For the red
+        rgb[1] = (argb >> 8) & 0xff; //For the green
+        rgb[2] = (argb) & 0xff; //For the blue
+
+        //System.out.println("Red: " + rgb[0] + ", Green: " + rgb[1] + ", Blue: " + rgb[2]);
+
+        return rgb;
+    }
+
+    private static String getMessage(String savedImg){
+        String hMessage = "";
+        String hChar = "";
+        int count = 0;
+        String temp;
+        BufferedImage img;
+
+        try{
+            img = ImageIO.read(new File(savedImg));
+            int height = img.getHeight();
+            int width = img.getWidth();
+            int[] rgb;
+
+            // reads entire image rather than only encoded bits. Leads to long runtime + nonsense characters. Find fix?
+            for(int i = 0; i < height; i++){
+                for(int j = 0; j < width; j++){
+                    rgb = pixel(img, j, i);
+                    for(int k = 0; k < rgb.length; k++){
+                        temp = Integer.toBinaryString(rgb[k]);
+                        hChar = hChar + temp.charAt(temp.length() - 1);
+                        count++;
+                        // extract message byte by byte to avoid parseInt overflows
+                        if (count == 8) {
+                            int charCode = Integer.parseInt(hChar, 2);
+                            //end of encrypted message
+                            if(charCode < 32 || charCode > 126){
+                              return hMessage;
+                            }
+                            
+                            hMessage += new Character((char)charCode).toString();
+                            hChar = "";
+                            count = 0;
+                        }
+                    }
+                }
+            }
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+
+        return hMessage;
+    }
+
+    private static String saveInImg(String textToBinary, int[][] pixelData, int height, int width){
+        int newBit, rgb;
+        int count = 0;
+        int len = textToBinary.length();
+        String temp, imgPath;
+
+        imgPath = "test.png";
+
+        // new and improved looping! :)
+        for (int i=0; i<len; i++) {
+            temp = Integer.toBinaryString(pixelData[i/3][i%3]);
+            newBit = Integer.valueOf(textToBinary.charAt(i));
+            temp = temp.replace(temp.charAt(temp.length() -1), (char)newBit);
+            pixelData[i/3][i%3] = Integer.parseInt(temp, 2);
+        }
+
+
+        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        int pixelNo = 0;
+        for(int i = 0; i < height; i++){
+            for(int j = 0; j < width; j++){
+                rgb = new Color (pixelData[pixelNo][0], pixelData[pixelNo][1], pixelData[pixelNo][2]).getRGB();
+                newImage.setRGB(j, i, rgb);
+                pixelNo++;
+            }
+        }
+
+        try{
+            ImageIO.write(newImage, "png", new File(imgPath));
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+
+        return imgPath;
+    }
+}
